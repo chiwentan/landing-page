@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Doto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Honk&display=swap');
 
 body, html {
     height: 100%;
     margin: 0;
-    font-family: 'Doto', sans-serif;
+    font-family: 'Honk', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
