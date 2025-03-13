@@ -74,7 +74,10 @@ const didGameEnd = () => {
     const hitToptWall = snake[0].y < 0;
     const hitBottomWall = snake[0].y > canvas.height - 10;
 
-    const hitObstacle = obstacles.some(obstacle => obstacle.x === snake[0].x && obstacle.y === snake[0].y);
+    const hitObstacle = obstacles.some(obstacle => {
+        return snake[0].x >= obstacle.x && snake[0].x < obstacle.x + obstacle.width &&
+               snake[0].y >= obstacle.y && snake[0].y < obstacle.y + obstacle.height;
+    });
 
     return hitLeftWall || hitRightWall || hitToptWall || hitBottomWall || hitObstacle;
 };
@@ -89,7 +92,8 @@ const createFood = () => {
     });
 
     obstacles.forEach((obstacle) => {
-        const isOnObstacle = obstacle.x === foodX && obstacle.y === foodY;
+        const isOnObstacle = foodX >= obstacle.x && foodX < obstacle.x + obstacle.width &&
+                             foodY >= obstacle.y && foodY < obstacle.y + obstacle.height;
         if (isOnObstacle) createFood();
     });
 };
@@ -104,16 +108,18 @@ const drawFood = () => {
 const createObstacle = () => {
     const obstacleX = Math.floor(Math.random() * 40) * 10;
     const obstacleY = Math.floor(Math.random() * 40) * 10;
+    const obstacleWidth = (Math.floor(Math.random() * 2) + 1) * 10; // width between 10 and 20
+    const obstacleHeight = (Math.floor(Math.random() * 2) + 1) * 10; // height between 10 and 20
 
-    obstacles.push({ x: obstacleX, y: obstacleY });
+    obstacles.push({ x: obstacleX, y: obstacleY, width: obstacleWidth, height: obstacleHeight });
 };
 
 const drawObstacles = () => {
     obstacles.forEach(obstacle => {
-        ctx.fillStyle = 'blue';
-        ctx.strokestyle = 'darkblue';
-        ctx.fillRect(obstacle.x, obstacle.y, 10, 10);
-        ctx.strokeRect(obstacle.x, obstacle.y, 10, 10);
+        ctx.fillStyle = 'white';
+        ctx.strokestyle = 'white';
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
     });
 };
 
