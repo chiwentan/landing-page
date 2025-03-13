@@ -1,16 +1,23 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const scoreDisplay = document.getElementById('score');
 
-let snake = [{ x: 200, y: 200 }];
-let dx = 10;
-let dy = 0;
+let snake;
+let dx;
+let dy;
 let foodX;
 let foodY;
+let changingDirection = false;
+let score = 0;
 
 const main = () => {
-    if (didGameEnd()) return;
+    if (didGameEnd()) {
+        showRestartButton();
+        return;
+    }
 
     setTimeout(() => {
+        changingDirection = false;
         clearCanvas();
         drawFood();
         advanceSnake();
@@ -44,6 +51,8 @@ const advanceSnake = () => {
 
     const didEatFood = snake[0].x === foodX && snake[0].y === foodY;
     if (didEatFood) {
+        score += 10;
+        scoreDisplay.innerHTML = 'Score: ' + score;
         createFood();
     } else {
         snake.pop();
@@ -82,6 +91,9 @@ const drawFood = () => {
 };
 
 const changeDirection = (event) => {
+    if (changingDirection) return;
+    changingDirection = true;
+
     const LEFT_KEY = 37;
     const RIGHT_KEY = 39;
     const UP_KEY = 38;
@@ -114,7 +126,35 @@ const changeDirection = (event) => {
     }
 };
 
+const showRestartButton = () => {
+    const restartButton = document.createElement('button');
+    restartButton.innerHTML = 'Restart Game';
+    restartButton.style.position = 'absolute';
+    restartButton.style.top = '50%';
+    restartButton.style.left = '50%';
+    restartButton.style.transform = 'translate(-50%, -50%)';
+    restartButton.style.padding = '10px 20px';
+    restartButton.style.fontSize = '1.5em';
+    restartButton.style.cursor = 'pointer';
+
+    restartButton.addEventListener('click', () => {
+        restartButton.remove();
+        startGame();
+    });
+
+    document.body.appendChild(restartButton);
+};
+
+const startGame = () => {
+    snake = [{ x: 200, y: 200 }];
+    dx = 10;
+    dy = 0;
+    score = 0;
+    scoreDisplay.innerHTML = 'Score: ' + score;
+    createFood();
+    main();
+};
+
 document.addEventListener('keydown', changeDirection);
 
-createFood();
-main();
+startGame();
