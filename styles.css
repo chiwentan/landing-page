@@ -58,7 +58,6 @@ body, html {
 
 /* Styling for the restart button */
 #restartButton {
-    display: none;
     padding: 10px 20px;
     font-size: 1.5em;
     color: white;
@@ -68,6 +67,7 @@ body, html {
     cursor: pointer;
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
     font-family: 'Honk', sans-serif;
+    display: none;
 }
 
 #restartButton:hover {
