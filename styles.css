@@ -29,46 +29,18 @@ body, html {
     animation-delay: 0s;
 }
 
-/* Glowing box */
-.glowing-box {
-    width: 200px;
-    height: 200px;
-    background-color: #444;
-    margin: 20px;
-    border-radius: 50%;
-    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5), 0 0 30px rgba(255, 0, 0, 0.3), 0 0 40px rgba(255, 0, 0, 0.2);
-}
-
-/* Glowing text */
-.glowing-text {
-    font-size: 2vw;
-    color: #fff;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5), 0 0 30px rgba(0, 255, 255, 0.3);
-}
-
-/* Styling for the game canvas */
-#gameCanvas {
-    border: 1px solid white;
-    background-color: #333;
-    margin-top: 20px;
-}
-
-/* Styling for the game button */
-.game-button {
+/* Styling for the snake link */
+.snake-link {
     position: absolute;
     bottom: 20px;
-    padding: 10px 20px;
-    font-size: 1.2em;
+    font-size: 5em;
     color: white;
-    background-color: #444;
-    border: 2px solid white;
-    border-radius: 5px;
     cursor: pointer;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    transition: color 0.3s ease;
 }
 
-.game-button:hover {
-    background-color: #555;
+.snake-link:hover {
+    color: #f0f;
 }
 
 @media (max-width: 600px) {
