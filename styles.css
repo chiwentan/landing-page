@@ -91,7 +91,7 @@ body, html {
 
 /* Hiding the snake game page on mobile devices */
 @media (max-width: 600px) {
-    body {
+    #gameCanvas, #score, #restartButton, .monkey-link {
         display: none;
     }
     .animated-text {
