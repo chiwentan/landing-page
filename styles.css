@@ -46,13 +46,6 @@ body, html {
 /* Styling for the game canvas */
 #gameCanvas {
     border: 1px solid white;
-    background-color: #7CFC00; /* LawnGreen color for turf */
-    background-image: 
-        linear-gradient(to right, #7CFC00 10px, transparent 10px),
-        linear-gradient(to bottom, #7CFC00 10px, transparent 10px),
-        linear-gradient(to right, #32CD32 10px, transparent 10px),
-        linear-gradient(to bottom, #32CD32 10px, transparent 10px);
-    background-size: 20px 20px;
     margin-top: 20px;
     margin-bottom: 20px; /* Added margin-bottom for spacing */
 }
@@ -96,7 +89,11 @@ body, html {
     color: #f0f;
 }
 
+/* Hiding the snake game page on mobile devices */
 @media (max-width: 600px) {
+    body {
+        display: none;
+    }
     .animated-text {
         font-size: 4vw;
     }
