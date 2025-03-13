@@ -46,7 +46,13 @@ body, html {
 /* Styling for the game canvas */
 #gameCanvas {
     border: 1px solid white;
-    background-color: #333;
+    background-color: #7CFC00; /* LawnGreen color for turf */
+    background-image: 
+        linear-gradient(to right, #7CFC00 10px, transparent 10px),
+        linear-gradient(to bottom, #7CFC00 10px, transparent 10px),
+        linear-gradient(to right, #32CD32 10px, transparent 10px),
+        linear-gradient(to bottom, #32CD32 10px, transparent 10px);
+    background-size: 20px 20px;
     margin-top: 20px;
 }
 
