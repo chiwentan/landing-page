@@ -10,12 +10,17 @@ let foodX;
 let foodY;
 let changingDirection = false;
 let score = 0;
+let obstacles = [];
+let gameSpeed = 100;
 
 const pixelSnakeImage = new Image();
 pixelSnakeImage.src = 'pixel-snake.png'; // Path to pixelated snake image
 
 const pixelFoodImage = new Image();
 pixelFoodImage.src = 'pixel-food.png'; // Path to pixelated food image
+
+const pixelObstacleImage = new Image();
+pixelObstacleImage.src = 'pixel-obstacle.png'; // Path to pixelated obstacle image
 
 const main = () => {
     if (didGameEnd()) {
@@ -27,11 +32,12 @@ const main = () => {
         changingDirection = false;
         clearCanvas();
         drawFood();
+        drawObstacles();
         advanceSnake();
         drawSnake();
 
         main();
-    }, 100);
+    }, gameSpeed);
 };
 
 const clearCanvas = () => {
@@ -56,6 +62,8 @@ const advanceSnake = () => {
         score += 10;
         scoreDisplay.innerHTML = 'Score: ' + score;
         createFood();
+        createObstacle();
+        increaseSpeed();
     } else {
         snake.pop();
     }
@@ -72,7 +80,9 @@ const didGameEnd = () => {
     const hitToptWall = snake[0].y < 0;
     const hitBottomWall = snake[0].y > canvas.height - 10;
 
-    return hitLeftWall || hitRightWall || hitToptWall || hitBottomWall;
+    const hitObstacle = obstacles.some(obstacle => obstacle.x === snake[0].x && obstacle.y === snake[0].y);
+
+    return hitLeftWall || hitRightWall || hitToptWall || hitBottomWall || hitObstacle;
 };
 
 const createFood = () => {
@@ -83,10 +93,34 @@ const createFood = () => {
         const hasEaten = part.x === foodX && part.y === foodY;
         if (hasEaten) createFood();
     });
+
+    obstacles.forEach((obstacle) => {
+        const isOnObstacle = obstacle.x === foodX && obstacle.y === foodY;
+        if (isOnObstacle) createFood();
+    });
 };
 
 const drawFood = () => {
     ctx.drawImage(pixelFoodImage, foodX, foodY, 10, 10);
+};
+
+const createObstacle = () => {
+    const obstacleX = Math.floor(Math.random() * 40) * 10;
+    const obstacleY = Math.floor(Math.random() * 40) * 10;
+
+    obstacles.push({ x: obstacleX, y: obstacleY });
+};
+
+const drawObstacles = () => {
+    obstacles.forEach(obstacle => {
+        ctx.drawImage(pixelObstacleImage, obstacle.x, obstacle.y, 10, 10);
+    });
+};
+
+const increaseSpeed = () => {
+    if (gameSpeed > 50) {
+        gameSpeed -= 5;
+    }
 };
 
 const changeDirection = (event) => {
@@ -134,6 +168,8 @@ const startGame = () => {
     dx = 10;
     dy = 0;
     score = 0;
+    gameSpeed = 100;
+    obstacles = [];
     scoreDisplay.innerHTML = 'Score: ' + score;
     restartButton.style.display = 'none';
     createFood();
