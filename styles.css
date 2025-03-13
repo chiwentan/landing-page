@@ -55,6 +55,24 @@ body, html {
     margin-top: 20px;
 }
 
+/* Styling for the game button */
+.game-button {
+    position: absolute;
+    bottom: 20px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    color: white;
+    background-color: #444;
+    border: 2px solid white;
+    border-radius: 5px;
+    cursor: pointer;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.game-button:hover {
+    background-color: #555;
+}
+
 @media (max-width: 600px) {
     .animated-text {
         font-size: 4vw;
