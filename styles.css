@@ -54,6 +54,7 @@ body, html {
         linear-gradient(to bottom, #32CD32 10px, transparent 10px);
     background-size: 20px 20px;
     margin-top: 20px;
+    margin-bottom: 20px; /* Added margin-bottom for spacing */
 }
 
 /* Styling for the score counter */
@@ -74,6 +75,7 @@ body, html {
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
     font-family: 'Honk', sans-serif;
     display: none;
+    position: absolute; /* Added to prevent moving the game box */
 }
 
 #restartButton:hover {
