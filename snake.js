@@ -11,6 +11,12 @@ let foodY;
 let changingDirection = false;
 let score = 0;
 
+const pixelSnakeImage = new Image();
+pixelSnakeImage.src = 'pixel-snake.png'; // Path to pixelated snake image
+
+const pixelFoodImage = new Image();
+pixelFoodImage.src = 'pixel-food.png'; // Path to pixelated food image
+
 const main = () => {
     if (didGameEnd()) {
         showRestartButton();
@@ -29,10 +35,8 @@ const main = () => {
 };
 
 const clearCanvas = () => {
-    ctx.fillStyle = '#333';
-    ctx.strokestyle = 'white';
+    ctx.fillStyle = '#7CFC00';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeRect(0, 0, canvas.width, canvas.height);
 };
 
 const drawSnake = () => {
@@ -40,10 +44,7 @@ const drawSnake = () => {
 };
 
 const drawSnakePart = (snakePart) => {
-    ctx.fillStyle = 'lightgreen';
-    ctx.strokestyle = 'darkgreen';
-    ctx.fillRect(snakePart.x, snakePart.y, 10, 10);
-    ctx.strokeRect(snakePart.x, snakePart.y, 10, 10);
+    ctx.drawImage(pixelSnakeImage, snakePart.x, snakePart.y, 10, 10);
 };
 
 const advanceSnake = () => {
@@ -85,10 +86,7 @@ const createFood = () => {
 };
 
 const drawFood = () => {
-    ctx.fillStyle = 'red';
-    ctx.strokestyle = 'darkred';
-    ctx.fillRect(foodX, foodY, 10, 10);
-    ctx.strokeRect(foodX, foodY, 10, 10);
+    ctx.drawImage(pixelFoodImage, foodX, foodY, 10, 10);
 };
 
 const changeDirection = (event) => {
