@@ -1,6 +1,7 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreDisplay = document.getElementById('score');
+const restartButton = document.getElementById('restartButton');
 
 let snake;
 let dx;
@@ -127,22 +128,7 @@ const changeDirection = (event) => {
 };
 
 const showRestartButton = () => {
-    const restartButton = document.createElement('button');
-    restartButton.innerHTML = 'Restart Game';
-    restartButton.style.position = 'absolute';
-    restartButton.style.top = '50%';
-    restartButton.style.left = '50%';
-    restartButton.style.transform = 'translate(-50%, -50%)';
-    restartButton.style.padding = '10px 20px';
-    restartButton.style.fontSize = '1.5em';
-    restartButton.style.cursor = 'pointer';
-
-    restartButton.addEventListener('click', () => {
-        restartButton.remove();
-        startGame();
-    });
-
-    document.body.appendChild(restartButton);
+    restartButton.style.display = 'block';
 };
 
 const startGame = () => {
@@ -151,6 +137,7 @@ const startGame = () => {
     dy = 0;
     score = 0;
     scoreDisplay.innerHTML = 'Score: ' + score;
+    restartButton.style.display = 'none';
     createFood();
     main();
 };
