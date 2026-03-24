@@ -74,3 +74,29 @@ body, html {
         font-size: 4vw;
     }
 }
+
+/* Snake game page */
+#gameCanvas {
+    display: block;
+    border: 1px solid rgba(100, 255, 120, 0.2);
+    box-shadow: 0 0 30px rgba(80, 200, 100, 0.15), 0 0 60px rgba(80, 200, 100, 0.05);
+    image-rendering: pixelated;
+    max-width: min(90vw, 90vh);
+    max-height: min(90vw, 90vh);
+}
+
+.monkey-link {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 2.5em;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+    filter: grayscale(20%);
+    z-index: 10;
+}
+
+.monkey-link:hover {
+    transform: scale(1.15);
+    filter: grayscale(0%);
+}
