@@ -39,6 +39,7 @@ body, html {
     border-right: 2px solid #e8e8e8;
     white-space: nowrap;
     overflow: hidden;
+    text-shadow: 0 0 12px rgba(0,0,0,0.95), 0 0 6px #000;
     width: 0;
     animation:
         typing 2.2s steps(31, end) forwards,
@@ -93,6 +94,17 @@ body, html {
 
     .snake-link::after {
         content: 'play';
+        display: block;
+        font-size: 0.32em;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0.35;
+        margin-top: 0.4em;
+        font-family: 'Space Mono', monospace;
+    }
+
+    .monkey-link::after {
+        content: 'home';
         display: block;
         font-size: 0.32em;
         letter-spacing: 0.2em;
