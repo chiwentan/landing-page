@@ -2,6 +2,7 @@
 
 body, html {
     height: 100%;
+    min-height: 100svh; /* excludes browser chrome on iOS */
     margin: 0;
     font-family: 'Space Mono', monospace;
     display: flex;
@@ -54,6 +55,11 @@ body, html {
     50%      { border-color: #e8e8e8; }
 }
 
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-7px); }
+}
+
 /* Penguin link to snake game */
 .snake-link {
     position: fixed;
@@ -71,11 +77,18 @@ body, html {
 }
 
 @media (max-width: 600px) {
-    .snake-link {
-        display: none;
-    }
     .animated-text {
-        font-size: clamp(12px, 3.8vw, 16px);
+        font-size: clamp(12px, 4vw, 16px);
+    }
+
+    /* Reveal penguin in-flow, centered below the contact text */
+    .snake-link {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        font-size: 2em;
+        margin-top: 2.5rem;
+        animation: float 3s ease-in-out infinite;
     }
 }
 

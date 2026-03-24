@@ -305,7 +305,7 @@ function drawWaitingScreen(ts) {
 
   ctx.fillStyle = 'rgba(255,255,255,0.35)';
   ctx.font = '11px "Space Mono", monospace';
-  ctx.fillText('Arrow keys / WASD to move', canvas.width / 2, canvas.height / 2 + 32);
+  ctx.fillText('Swipe  or  Arrow keys / WASD', canvas.width / 2, canvas.height / 2 + 32);
 
   if (highScore > 0) {
     ctx.fillStyle = 'rgba(255, 210, 80, 0.75)';
