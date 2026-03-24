@@ -264,7 +264,7 @@ function updateAndDrawFloatingTexts() {
     t.alpha -= 0.022;
     if (t.alpha <= 0) { floatingTexts.splice(i, 1); continue; }
     ctx.globalAlpha = t.alpha;
-    ctx.font = 'bold 11px monospace';
+    ctx.font = 'bold 11px "Space Mono", monospace';
     ctx.fillStyle = '#7fff7f';
     ctx.textAlign = 'center';
     ctx.fillText(t.text, t.x, t.y);
@@ -274,7 +274,7 @@ function updateAndDrawFloatingTexts() {
 
 function drawHUD() {
   const level = Math.round((100 - gameSpeed) / 5) + 1;
-  ctx.font = '12px monospace';
+  ctx.font = '12px "Space Mono", monospace';
   ctx.textAlign = 'left';
   ctx.fillStyle = 'rgba(255,255,255,0.65)';
   ctx.fillText(`Score: ${score}`, 8, 16);
@@ -282,7 +282,7 @@ function drawHUD() {
   ctx.fillText(`Best: ${highScore}`, canvas.width - 8, 16);
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.font = '10px monospace';
+  ctx.font = '10px "Space Mono", monospace';
   ctx.fillText(`Lv ${level}`, canvas.width / 2, 16);
 }
 
@@ -292,7 +292,7 @@ function drawWaitingScreen(ts) {
 
   const pulse = Math.sin(ts / 600) * 0.15 + 0.85;
   ctx.textAlign = 'center';
-  ctx.font = 'bold 38px monospace';
+  ctx.font = 'bold 38px "Space Mono", monospace';
   ctx.fillStyle = `rgba(100, 255, 120, ${pulse})`;
   ctx.shadowColor = 'rgba(80, 255, 100, 0.7)';
   ctx.shadowBlur = 20;
@@ -300,16 +300,16 @@ function drawWaitingScreen(ts) {
   ctx.shadowBlur = 0;
 
   ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.font = '13px monospace';
+  ctx.font = '13px "Space Mono", monospace';
   ctx.fillText('Press any key or tap to start', canvas.width / 2, canvas.height / 2 + 12);
 
   ctx.fillStyle = 'rgba(255,255,255,0.35)';
-  ctx.font = '11px monospace';
+  ctx.font = '11px "Space Mono", monospace';
   ctx.fillText('Arrow keys / WASD to move', canvas.width / 2, canvas.height / 2 + 32);
 
   if (highScore > 0) {
     ctx.fillStyle = 'rgba(255, 210, 80, 0.75)';
-    ctx.font = '12px monospace';
+    ctx.font = '12px "Space Mono", monospace';
     ctx.fillText(`Best: ${highScore}`, canvas.width / 2, canvas.height / 2 + 58);
   }
 }
@@ -319,31 +319,31 @@ function drawGameOverScreen() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.textAlign = 'center';
-  ctx.font = 'bold 30px monospace';
+  ctx.font = 'bold 30px "Space Mono", monospace';
   ctx.fillStyle = '#ff5555';
   ctx.shadowColor = 'rgba(255, 80, 80, 0.6)';
   ctx.shadowBlur = 16;
   ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 38);
   ctx.shadowBlur = 0;
 
-  ctx.font = '15px monospace';
+  ctx.font = '15px "Space Mono", monospace';
   ctx.fillStyle = 'rgba(255,255,255,0.9)';
   ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 2);
 
   if (newBest && score > 0) {
-    ctx.font = 'bold 14px monospace';
+    ctx.font = 'bold 14px "Space Mono", monospace';
     ctx.fillStyle = '#ffd700';
     ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
     ctx.shadowBlur = 10;
     ctx.fillText(`✦ New Best: ${highScore}! ✦`, canvas.width / 2, canvas.height / 2 + 24);
     ctx.shadowBlur = 0;
   } else if (highScore > 0) {
-    ctx.font = '13px monospace';
+    ctx.font = '13px "Space Mono", monospace';
     ctx.fillStyle = 'rgba(255, 210, 80, 0.65)';
     ctx.fillText(`Best: ${highScore}`, canvas.width / 2, canvas.height / 2 + 24);
   }
 
-  ctx.font = '12px monospace';
+  ctx.font = '12px "Space Mono", monospace';
   ctx.fillStyle = 'rgba(255,255,255,0.45)';
   ctx.fillText('Press any key or tap to restart', canvas.width / 2, canvas.height / 2 + 52);
 }
