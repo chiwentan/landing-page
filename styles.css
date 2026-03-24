@@ -1,64 +1,106 @@
-@import url('https://fonts.googleapis.com/css2?family=Honk&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
 body, html {
     height: 100%;
     margin: 0;
-    font-family: 'Honk', sans-serif;
+    font-family: 'Space Mono', monospace;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: black;
-    color: white;
+    background-color: #080810;
+    color: #e8e8e8;
+}
+
+/* ---- Landing page ---- */
+
+#bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .container {
+    position: relative;
+    z-index: 1;
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 50%;
 }
 
 .animated-text {
-    font-size: 1.5vw;
-    border-right: 2px solid white;
+    font-size: clamp(13px, 1.4vw, 18px);
+    letter-spacing: 0.04em;
+    border-right: 2px solid #e8e8e8;
     white-space: nowrap;
     overflow: hidden;
-    animation: typing 4s steps(30, end) infinite, blink-caret .75s step-end infinite;
-    animation-delay: 0s;
+    width: 0;
+    animation:
+        typing 2.2s steps(31, end) forwards,
+        blink-caret 0.75s step-end infinite;
 }
 
 @keyframes typing {
     from { width: 0; }
-    to { width: 100%; }
+    to   { width: 100%; }
 }
 
 @keyframes blink-caret {
     from, to { border-color: transparent; }
-    50% { border-color: white; }
+    50%      { border-color: #e8e8e8; }
 }
 
-/* Styling for the snake link */
+/* Penguin link to snake game */
 .snake-link {
-    position: absolute;
-    bottom: 20px;
-    font-size: 5em;
-    color: white;
+    position: fixed;
+    z-index: 1;
+    bottom: 24px;
+    right: 24px;
+    font-size: 2.2em;
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: transform 0.2s ease, filter 0.2s ease;
+    user-select: none;
 }
 
 .snake-link:hover {
-    color: #f0f;
+    transform: scale(1.15);
 }
 
-/* Hiding the snake link on mobile devices */
 @media (max-width: 600px) {
     .snake-link {
         display: none;
     }
     .animated-text {
-        font-size: 4vw;
+        font-size: clamp(12px, 3.8vw, 16px);
     }
+}
+
+/* ---- Snake game page ---- */
+
+#gameCanvas {
+    display: block;
+    border: 1px solid rgba(100, 255, 120, 0.15);
+    box-shadow: 0 0 40px rgba(80, 200, 100, 0.1), 0 0 80px rgba(80, 200, 100, 0.04);
+    image-rendering: pixelated;
+    max-width: min(90vw, 90vh);
+    max-height: min(90vw, 90vh);
+}
+
+.monkey-link {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    font-size: 2.2em;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    user-select: none;
+    z-index: 10;
+}
+
+.monkey-link:hover {
+    transform: scale(1.15);
 }
