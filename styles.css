@@ -90,6 +90,17 @@ body, html {
         margin-top: 2.5rem;
         animation: float 3s ease-in-out infinite;
     }
+
+    .snake-link::after {
+        content: 'play';
+        display: block;
+        font-size: 0.32em;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0.35;
+        margin-top: 0.4em;
+        font-family: 'Space Mono', monospace;
+    }
 }
 
 /* ---- Snake game page ---- */
