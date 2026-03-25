@@ -10,9 +10,25 @@
 <body>
     <canvas id="bg"></canvas>
     <div class="container">
-        <p class="animated-text">Enquiries → hello@chiwentan.com</p>
+        <p class="animated-text">Enquiries → <span id="email-trigger">hello@chiwentan.com</span></p>
     </div>
     <div class="snake-link" onclick="navigateFade('snake.html')">&#128013;</div>
+
+    <!-- Enquiry modal -->
+    <div id="enquiry-modal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <button class="modal-close" id="modal-close">✕</button>
+            <h2 class="modal-title">Send an enquiry</h2>
+            <form id="enquiry-form">
+                <label class="modal-label" for="enq-subject">Subject</label>
+                <input id="enq-subject" class="modal-input" type="text" placeholder="What's on your mind?" />
+                <label class="modal-label" for="enq-message">Message</label>
+                <textarea id="enq-message" class="modal-textarea" rows="5" placeholder="..."></textarea>
+                <button type="submit" class="modal-submit">SEND →</button>
+            </form>
+            <p class="modal-direct">or email directly: <a href="mailto:hello@chiwentan.com">hello@chiwentan.com</a></p>
+        </div>
+    </div>
 
     <!-- Terminal overlay -->
     <div id="terminal" class="terminal-overlay hidden">
@@ -164,6 +180,45 @@
 
         // Backtick opens terminal (handled in particles.js via window event)
         window.addEventListener('open-terminal', openTerminal);
+
+        // ── Enquiry modal ────────────────────────────────────────────────────
+        const modalEl      = document.getElementById('enquiry-modal');
+        const modalCloseEl = document.getElementById('modal-close');
+        const enquiryForm  = document.getElementById('enquiry-form');
+        const subjectInput = document.getElementById('enq-subject');
+        const messageInput = document.getElementById('enq-message');
+
+        function openModal() {
+            modalEl.classList.remove('hidden');
+            setTimeout(() => subjectInput.focus(), 40);
+        }
+
+        function closeModal() {
+            modalEl.classList.add('hidden');
+        }
+
+        document.getElementById('email-trigger').addEventListener('click', openModal);
+        modalCloseEl.addEventListener('click', closeModal);
+
+        // Close on backdrop click (not card click)
+        modalEl.addEventListener('click', (e) => {
+            if (e.target === modalEl) closeModal();
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modalEl.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+
+        enquiryForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const subject = encodeURIComponent(subjectInput.value.trim() || 'Enquiry');
+            const body    = encodeURIComponent(messageInput.value.trim());
+            window.open(`mailto:hello@chiwentan.com?subject=${subject}&body=${body}`);
+            closeModal();
+        });
     </script>
 </body>
 </html>

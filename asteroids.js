@@ -391,6 +391,41 @@ function drawHUD() {
     ctx.fillText(livesStr, canvas.width / 2, 28);
 }
 
+// ── Mobile touch controls ──────────────────────────────────────────────────────
+const isMobile = navigator.maxTouchPoints > 0;
+const BTNS = [
+    { key: 'ArrowLeft',  label: '◁', cx: () => 60,               cy: () => canvas.height - 64  },
+    { key: 'ArrowRight', label: '▷', cx: () => 160,              cy: () => canvas.height - 64  },
+    { key: 'ArrowUp',    label: '△', cx: () => canvas.width - 70, cy: () => canvas.height - 150 },
+    { key: ' ',          label: '●', cx: () => canvas.width - 70, cy: () => canvas.height - 58  },
+];
+const BTN_R = 44;
+const activePointers = {};
+
+function btnAt(x, y) {
+    return BTNS.find(b => Math.hypot(x - b.cx(), y - b.cy()) <= BTN_R);
+}
+
+function drawTouchControls() {
+    if (!isMobile || state !== STATE.PLAYING) return;
+    for (const b of BTNS) {
+        const active = keys[b.key];
+        ctx.beginPath();
+        ctx.arc(b.cx(), b.cy(), BTN_R, 0, Math.PI * 2);
+        ctx.fillStyle   = active ? 'rgba(140,220,255,0.25)' : 'rgba(255,255,255,0.07)';
+        ctx.fill();
+        ctx.strokeStyle = active ? 'rgba(140,220,255,0.6)'  : 'rgba(255,255,255,0.2)';
+        ctx.lineWidth   = 1.5;
+        ctx.stroke();
+        ctx.font         = '22px "Space Mono", monospace';
+        ctx.textAlign    = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle    = active ? 'rgba(140,220,255,0.9)' : 'rgba(255,255,255,0.4)';
+        ctx.fillText(b.label, b.cx(), b.cy());
+    }
+    ctx.textBaseline = 'alphabetic';
+}
+
 function drawFloatingTexts() {
     for (const t of floatingTexts) {
         ctx.globalAlpha = t.life;
@@ -451,10 +486,10 @@ function render() {
     }
 
     if (state === STATE.WAITING) {
-        drawOverlay(
-            ['ASTEROIDS', 'Press any key to start'],
-            ['← → / A D   Rotate', '↑ / W   Thrust', 'Space   Fire', `Best: ${highScore}`]
-        );
+        const sublines = isMobile
+            ? ['Tap to start', 'Hold landing page to open terminal']
+            : ['← → / A D   Rotate', '↑ / W   Thrust', 'Space   Fire', `Best: ${highScore}`];
+        drawOverlay(['ASTEROIDS', isMobile ? 'Tap to start' : 'Press any key to start'], sublines);
         return;
     }
 
@@ -465,11 +500,12 @@ function render() {
     if (state === STATE.PLAYING) drawShip();
     drawFloatingTexts();
     drawHUD();
+    drawTouchControls();
 
     if (state === STATE.DEAD) {
         drawOverlay(
             ['GAME OVER', `Score: ${score}`, `Best: ${highScore}`],
-            ['Press any key to restart']
+            [isMobile ? 'Tap to restart' : 'Press any key to restart']
         );
     }
 
@@ -499,24 +535,27 @@ document.addEventListener('keyup', (e) => {
     keys[e.key] = false;
 });
 
-// Touch controls
-let touchStartX = 0, touchStartY = 0;
-document.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    if (state !== STATE.PLAYING) { state = STATE.PLAYING; initGame(); }
-}, { passive: true });
-
-document.addEventListener('touchend', (e) => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    const dy = e.changedTouches[0].clientY - touchStartY;
-    const absDx = Math.abs(dx), absDy = Math.abs(dy);
-    // Tap = fire
-    if (absDx < 15 && absDy < 15) {
-        keys[' '] = true;
-        setTimeout(() => { keys[' '] = false; }, 80);
+// Touch / pointer controls (replaces old touchstart/touchend)
+canvas.addEventListener('pointerdown', (e) => {
+    const btn = btnAt(e.clientX, e.clientY);
+    if (btn) {
+        keys[btn.key] = true;
+        activePointers[e.pointerId] = btn.key;
+    } else if (state !== STATE.PLAYING) {
+        state = STATE.PLAYING;
+        initGame();
     }
-}, { passive: true });
+});
+
+canvas.addEventListener('pointerup', (e) => {
+    const k = activePointers[e.pointerId];
+    if (k) { keys[k] = false; delete activePointers[e.pointerId]; }
+});
+
+canvas.addEventListener('pointercancel', (e) => {
+    const k = activePointers[e.pointerId];
+    if (k) { keys[k] = false; delete activePointers[e.pointerId]; }
+});
 
 // ── Start ──────────────────────────────────────────────────────────────────────
 loop();

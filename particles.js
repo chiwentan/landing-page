@@ -269,6 +269,17 @@ window.addEventListener('touchend', () => {
   mouse.y = -9999;
 });
 
+// Long-press (500ms) anywhere on landing page → open terminal
+let longPressTimer = null;
+window.addEventListener('pointerdown', () => {
+  longPressTimer = setTimeout(() => {
+    window.dispatchEvent(new Event('open-terminal'));
+  }, 500);
+});
+window.addEventListener('pointerup',     () => clearTimeout(longPressTimer));
+window.addEventListener('pointermove',   () => clearTimeout(longPressTimer));
+window.addEventListener('pointercancel', () => clearTimeout(longPressTimer));
+
 // ── Matrix rain ────────────────────────────────────────────────────────────────
 const MATRIX_CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
 let matrixActive = false;
