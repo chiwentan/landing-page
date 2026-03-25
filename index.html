@@ -13,6 +13,16 @@
         <p class="animated-text">Enquiries → hello@chiwentan.com</p>
     </div>
     <div class="snake-link" onclick="navigateFade('snake.html')">&#128013;</div>
+
+    <!-- Terminal overlay -->
+    <div id="terminal" class="terminal-overlay hidden">
+        <div id="term-output"></div>
+        <div class="term-input-row">
+            <span class="term-prompt">user@landing:~$&nbsp;</span>
+            <input id="term-input" type="text" autocomplete="off" spellcheck="false" />
+        </div>
+    </div>
+
     <script src="particles.js"></script>
     <script>
         // X1: fade in on load, fade out on navigate
@@ -23,6 +33,137 @@
             document.body.classList.remove('loaded');
             setTimeout(() => location.href = url, 320);
         }
+
+        // ── Terminal easter egg ──────────────────────────────────────────────
+        const termEl    = document.getElementById('terminal');
+        const outputEl  = document.getElementById('term-output');
+        const inputEl   = document.getElementById('term-input');
+        let termHistory = [], termHistIdx = -1;
+        let termOpen    = false;
+
+        function openTerminal() {
+            termOpen = true;
+            termEl.classList.remove('hidden');
+            if (outputEl.children.length === 0) {
+                termPrint('sys', 'landing-page terminal v1.0');
+                termPrint('sys', 'type  help  for available commands.');
+                termPrint('sys', '');
+            }
+            setTimeout(() => inputEl.focus(), 20);
+        }
+
+        function closeTerminal() {
+            termOpen = false;
+            termEl.classList.add('hidden');
+            inputEl.blur();
+        }
+
+        function termPrint(type, text) {
+            const div = document.createElement('div');
+            div.className = 'term-line' + (type ? ' term-' + type : '');
+            div.textContent = text;
+            outputEl.appendChild(div);
+            outputEl.scrollTop = outputEl.scrollHeight;
+        }
+
+        const COMMANDS = {
+            help() {
+                termPrint('info', 'available commands:');
+                ['about','contact','ls','play <game>','whoami','clear','matrix','exit'].forEach(c =>
+                    termPrint('', '  ' + c));
+            },
+            about() {
+                termPrint('', 'chiwen tan — software engineer & builder.');
+                termPrint('', 'building things on the internet.');
+            },
+            contact() {
+                termPrint('info', 'hello@chiwentan.com');
+            },
+            whoami() {
+                termPrint('', 'chiwen');
+            },
+            ls(args) {
+                if (!args || args === '') {
+                    termPrint('info', 'games/  about.txt  contact.txt');
+                } else if (args.trim() === 'games/' || args.trim() === 'games') {
+                    termPrint('info', 'snake  asteroids  slots');
+                } else {
+                    termPrint('err', 'ls: no such file or directory: ' + args.trim());
+                }
+            },
+            play(args) {
+                const game = (args || '').trim().toLowerCase();
+                const map = { snake: 'snake.html', asteroids: 'asteroids.html', slots: 'slots.html' };
+                if (map[game]) {
+                    termPrint('sys', 'launching ' + game + '...');
+                    setTimeout(() => navigateFade(map[game]), 600);
+                } else {
+                    termPrint('err', 'unknown game: ' + (game || '?'));
+                    termPrint('', '  available: snake  asteroids  slots');
+                }
+            },
+            clear() {
+                outputEl.innerHTML = '';
+            },
+            matrix() {
+                termPrint('sys', 'initiating...');
+                setTimeout(() => {
+                    closeTerminal();
+                    if (typeof triggerMatrix === 'function') triggerMatrix();
+                }, 400);
+            },
+            exit() {
+                closeTerminal();
+            },
+        };
+
+        function runCommand(raw) {
+            const trimmed = raw.trim();
+            if (!trimmed) return;
+
+            // Save history
+            termHistory.unshift(trimmed);
+            if (termHistory.length > 50) termHistory.pop();
+            termHistIdx = -1;
+
+            termPrint('prompt', '$ ' + trimmed);
+
+            const [cmd, ...rest] = trimmed.split(/\s+/);
+            const args = rest.join(' ');
+            const handler = COMMANDS[cmd.toLowerCase()];
+            if (handler) {
+                handler(args);
+            } else {
+                termPrint('err', 'command not found: ' + cmd);
+            }
+        }
+
+        inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                runCommand(inputEl.value);
+                inputEl.value = '';
+            } else if (e.key === 'Escape') {
+                closeTerminal();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (termHistIdx < termHistory.length - 1) {
+                    termHistIdx++;
+                    inputEl.value = termHistory[termHistIdx];
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (termHistIdx > 0) {
+                    termHistIdx--;
+                    inputEl.value = termHistory[termHistIdx];
+                } else {
+                    termHistIdx = -1;
+                    inputEl.value = '';
+                }
+            }
+        });
+
+        // Backtick opens terminal (handled in particles.js via window event)
+        window.addEventListener('open-terminal', openTerminal);
     </script>
 </body>
 </html>

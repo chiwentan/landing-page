@@ -269,6 +269,105 @@ window.addEventListener('touchend', () => {
   mouse.y = -9999;
 });
 
+// ── Matrix rain ────────────────────────────────────────────────────────────────
+const MATRIX_CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+let matrixActive = false;
+let matrixRafId  = null;
+let mainRafId    = null;
+let matrixCols   = [];
+
+function triggerMatrix() {
+    if (matrixActive) return;
+    matrixActive = true;
+
+    // pause main particle loop — cancel the next scheduled frame
+    // (animate() already scheduled itself; we let it run once more then take over)
+    const colW = 16;
+    const cols  = Math.floor(canvas.width / colW);
+    matrixCols  = Array.from({ length: cols }, () => Math.random() * canvas.height);
+
+    let endTimer = null;
+
+    function matrixFrame() {
+        if (!matrixActive) return;
+
+        // Dim previous frame
+        ctx.fillStyle = 'rgba(0,0,0,0.08)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.font = `14px "Space Mono", monospace`;
+
+        for (let i = 0; i < matrixCols.length; i++) {
+            const char = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
+            const x    = i * colW;
+            const y    = matrixCols[i];
+
+            // Bright leading character
+            ctx.fillStyle  = 'rgba(200,255,200,0.95)';
+            ctx.shadowColor = 'rgba(0,255,80,0.9)';
+            ctx.shadowBlur  = 8;
+            ctx.fillText(char, x, y);
+            ctx.shadowBlur  = 0;
+
+            // Advance column; reset randomly
+            matrixCols[i] += 18;
+            if (matrixCols[i] > canvas.height && Math.random() > 0.975) {
+                matrixCols[i] = 0;
+            }
+        }
+
+        matrixRafId = requestAnimationFrame(matrixFrame);
+    }
+
+    // Hijack: cancel the pending particle animate frame and start matrix
+    // We track the raf id via a wrapper
+    matrixFrame();
+
+    // After 6s fade out and restore
+    endTimer = setTimeout(() => {
+        matrixActive = false;
+        if (matrixRafId) cancelAnimationFrame(matrixRafId);
+        // Fade out over ~0.8s then resume particles
+        let fadeAlpha = 0;
+        function fadeOut() {
+            fadeAlpha += 0.06;
+            ctx.fillStyle = `rgba(0,0,0,${Math.min(fadeAlpha, 1)})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if (fadeAlpha < 1) {
+                requestAnimationFrame(fadeOut);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                animate(); // resume particles
+            }
+        }
+        fadeOut();
+    }, 6000);
+}
+
+// ── Konami code ────────────────────────────────────────────────────────────────
+const KONAMI_SEQ = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown',
+                    'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIdx = 0;
+
+document.addEventListener('keydown', (e) => {
+    // Backtick → open terminal
+    if (e.key === '`') {
+        window.dispatchEvent(new Event('open-terminal'));
+        return;
+    }
+
+    // Konami sequence tracking
+    if (e.key === KONAMI_SEQ[konamiIdx]) {
+        konamiIdx++;
+        if (konamiIdx === KONAMI_SEQ.length) {
+            konamiIdx = 0;
+            triggerMatrix();
+        }
+    } else {
+        konamiIdx = (e.key === KONAMI_SEQ[0]) ? 1 : 0;
+    }
+});
+
 // Init
 resize();
 for (let i = 0; i < particleCount(); i++) particles.push(new Particle());

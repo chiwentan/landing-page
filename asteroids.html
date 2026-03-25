@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+    <title>Asteroids</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <div class="monkey-link" onclick="navigateFade('index.html')">&#128018;</div>
-    <div class="rocket-link" onclick="navigateFade('asteroids.html')">&#128640;</div>
-    <script src="snake.js"></script>
+    <canvas id="asteroidsCanvas"></canvas>
+    <div class="monkey-link" onclick="navigateFade('index.html')">&#127968;</div>
+    <div class="slot-link" onclick="navigateFade('slots.html')">&#127920;</div>
+    <script src="asteroids.js"></script>
     <script>
-        // X1: fade in on load, fade out on navigate
         document.addEventListener('DOMContentLoaded', () => {
             requestAnimationFrame(() => document.body.classList.add('loaded'));
         });
