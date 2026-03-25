@@ -447,3 +447,135 @@ body.loaded {
     text-decoration: underline;
     text-underline-offset: 3px;
 }
+
+/* ---- Desktop hover labels for forward-nav links ---- */
+@media (min-width: 601px) {
+    .rocket-link::after {
+        content: 'asteroids →';
+        position: absolute;
+        left: 50%;
+        bottom: -1.4em;
+        transform: translateX(-50%);
+        font-size: 0.3em;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 0.2s;
+        white-space: nowrap;
+        font-family: 'Space Mono', monospace;
+        pointer-events: none;
+    }
+    .rocket-link:hover::after { opacity: 0.45; }
+
+    .slot-link::after {
+        content: 'slots →';
+        position: absolute;
+        left: 50%;
+        bottom: -1.4em;
+        transform: translateX(-50%);
+        font-size: 0.3em;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 0.2s;
+        white-space: nowrap;
+        font-family: 'Space Mono', monospace;
+        pointer-events: none;
+    }
+    .slot-link:hover::after { opacity: 0.45; }
+}
+
+/* ---- Terminal hint (desktop landing page) ---- */
+.terminal-hint {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: rgba(255,255,255,0.12);
+    cursor: pointer;
+    z-index: 1;
+    transition: color 0.2s ease;
+    user-select: none;
+}
+
+.terminal-hint:hover {
+    color: rgba(255,255,255,0.4);
+}
+
+/* ---- 404 page ---- */
+.four-oh-four {
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.glitch-text {
+    font-size: clamp(60px, 12vw, 120px);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.85);
+    animation: glitch 4s infinite;
+    margin: 0;
+}
+
+@keyframes glitch {
+    0%, 90%, 100% {
+        transform: translate(0);
+        text-shadow: none;
+    }
+    92% {
+        transform: translate(-3px, 1px);
+        text-shadow: 2px 0 #ff0040, -2px 0 #00ffff;
+    }
+    94% {
+        transform: translate(3px, -1px);
+        text-shadow: -2px 0 #ff0040, 2px 0 #00ffff;
+    }
+    96% {
+        transform: translate(-1px, 2px);
+        text-shadow: 1px 0 #ff0040, -1px 0 #00ffff;
+    }
+    98% {
+        transform: translate(2px, -2px);
+        text-shadow: -1px 0 #ff0040, 1px 0 #00ffff;
+    }
+}
+
+.animated-text-404 {
+    font-size: clamp(12px, 1.2vw, 16px);
+    letter-spacing: 0.04em;
+    border-right: 2px solid #e8e8e8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-shadow: 0 0 12px rgba(0,0,0,0.95), 0 0 6px #000;
+    width: 0;
+    animation:
+        typing 1.8s steps(21, end) 0.5s forwards,
+        blink-caret 0.75s step-end infinite;
+}
+
+.home-btn {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.6rem 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: rgba(140,220,255,0.9);
+    border: 1px solid rgba(140,220,255,0.35);
+    background: rgba(140,220,255,0.08);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    opacity: 0;
+    animation: fadeIn 0.5s ease 2.5s forwards;
+}
+
+.home-btn:hover {
+    background: rgba(140,220,255,0.16);
+    border-color: rgba(140,220,255,0.6);
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
