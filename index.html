@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hello</title>
+    <title>chiwentan</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐧</text></svg>">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,7 +12,17 @@
     <div class="container">
         <p class="animated-text">Enquiries → hello@chiwentan.com</p>
     </div>
-    <div class="snake-link" onclick="location.href='snake.html'">&#128013;</div>
+    <div class="snake-link" onclick="navigateFade('snake.html')">&#128013;</div>
     <script src="particles.js"></script>
+    <script>
+        // X1: fade in on load, fade out on navigate
+        document.addEventListener('DOMContentLoaded', () => {
+            requestAnimationFrame(() => document.body.classList.add('loaded'));
+        });
+        function navigateFade(url) {
+            document.body.classList.remove('loaded');
+            setTimeout(() => location.href = url, 320);
+        }
+    </script>
 </body>
 </html>

@@ -4,11 +4,15 @@ const ctx = canvas.getContext('2d');
 let mouse = { x: -9999, y: -9999 };
 let particles = [];
 let ripples = [];
+let trailParticles = []; // L1: comet trail
 let lastIdleTime = Date.now();
 const IDLE_PULSE_INTERVAL = 4000;
 const CONNECTION_DIST = 120;
 const ATTRACTION_DIST = 200;
 const REPULSION_DIST = 150;
+
+// L5: cache text element for proximity glow
+const textEl = document.querySelector('.animated-text');
 
 function particleCount() {
   const w = window.innerWidth;
@@ -68,8 +72,11 @@ class Particle {
 
     const radius = nearMouse ? 3 : 2;
     let r = 255, g = 255, b = 255;
-    if (nearMouse) { r = 180; g = 220; b = 255; }
-    else if (midRange) {
+
+    // L3: slowly cycle hue for near-mouse particles
+    const accentHue = (Date.now() / 200) % 360;
+
+    if (!nearMouse && midRange) {
       const t = 1 - distToMouse / ATTRACTION_DIST;
       g = Math.round(255 - t * 35);
       b = Math.round(255);
@@ -78,8 +85,13 @@ class Particle {
 
     ctx.beginPath();
     ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = `rgb(${r},${g},${b})`;
-    ctx.shadowColor = nearMouse ? 'rgba(180,220,255,0.8)' : 'rgba(255,255,255,0.4)';
+    if (nearMouse) {
+      ctx.fillStyle = `hsl(${accentHue}, 65%, 85%)`;
+      ctx.shadowColor = `hsla(${accentHue}, 70%, 80%, 0.8)`;
+    } else {
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.shadowColor = 'rgba(255,255,255,0.4)';
+    }
     ctx.shadowBlur = nearMouse ? 10 : 6;
     ctx.fill();
     ctx.shadowBlur = 0;
@@ -108,7 +120,7 @@ function drawConnections() {
 function drawRipples() {
   for (let i = ripples.length - 1; i >= 0; i--) {
     const r = ripples[i];
-    r.radius += 3;
+    r.radius += r.grow || 3; // L2: per-ripple grow rate
     r.alpha -= 0.018;
     if (r.alpha <= 0) { ripples.splice(i, 1); continue; }
     ctx.beginPath();
@@ -119,16 +131,53 @@ function drawRipples() {
   }
 }
 
+// L1: draw and update comet trail particles
+function drawTrail() {
+  const hue = (Date.now() / 200) % 360;
+  for (let i = trailParticles.length - 1; i >= 0; i--) {
+    const p = trailParticles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= 0.045;
+    if (p.life <= 0) { trailParticles.splice(i, 1); continue; }
+    ctx.globalAlpha = p.life * 0.65;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+    ctx.fillStyle = `hsl(${hue}, 70%, 85%)`;
+    ctx.shadowColor = `hsl(${hue}, 70%, 80%)`;
+    ctx.shadowBlur = 4;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+  ctx.globalAlpha = 1;
+}
+
+// L5: brighten email text when cursor approaches
+function updateTextProximity() {
+  if (!textEl) return;
+  const rect = textEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const dist = Math.sqrt((mouse.x - cx) ** 2 + (mouse.y - cy) ** 2);
+  const t = Math.max(0, 1 - dist / 280);
+  const glowBlur = t * 20;
+  const glowAlpha = t * 0.28;
+  textEl.style.textShadow = `0 0 12px rgba(0,0,0,0.95), 0 0 6px #000` +
+    (glowAlpha > 0.01 ? `, 0 0 ${glowBlur.toFixed(1)}px rgba(232,232,232,${glowAlpha.toFixed(2)})` : '');
+}
+
 function triggerIdlePulse() {
   const p = particles[Math.floor(Math.random() * particles.length)];
-  ripples.push({ x: p.x, y: p.y, radius: 2, alpha: 0.25 });
+  ripples.push({ x: p.x, y: p.y, radius: 2, alpha: 0.25, grow: 3 });
 }
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawConnections();
+  drawTrail(); // L1: trail under particles
   for (const p of particles) { p.update(); p.draw(); }
   drawRipples();
+  updateTextProximity(); // L5
 
   if (Date.now() - lastIdleTime > IDLE_PULSE_INTERVAL) {
     triggerIdlePulse();
@@ -165,14 +214,33 @@ function handleRepulsion(x, y) {
       p.vy += (dy / dist) * force;
     }
   }
-  ripples.push({ x, y, radius: 2, alpha: 0.6 });
-  lastIdleTime = Date.now(); // reset idle timer after interaction
+  // L2: double-ring shockwave — primary ring + faster outer ring
+  ripples.push({ x, y, radius: 2, alpha: 0.6, grow: 3 });
+  ripples.push({ x, y, radius: 2, alpha: 0.35, grow: 5.5 });
+  lastIdleTime = Date.now();
 }
 
 // Events
 window.addEventListener('resize', resize);
 
 window.addEventListener('mousemove', (e) => {
+  // L1: compute velocity before updating mouse position, spawn trail if moving fast
+  const vx = e.clientX - mouse.x;
+  const vy = e.clientY - mouse.y;
+  const spd = Math.sqrt(vx * vx + vy * vy);
+  if (mouse.x > -9000 && spd > 5) {
+    const count = Math.min(Math.floor(spd / 6), 4);
+    for (let i = 0; i < count; i++) {
+      trailParticles.push({
+        x: mouse.x + (Math.random() - 0.5) * 6,
+        y: mouse.y + (Math.random() - 0.5) * 6,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        life: 0.5 + Math.random() * 0.3,
+        r: 1 + Math.random(),
+      });
+    }
+  }
   mouse.x = e.clientX;
   mouse.y = e.clientY;
   lastIdleTime = Date.now();
