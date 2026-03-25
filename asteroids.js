@@ -392,7 +392,7 @@ function drawHUD() {
 }
 
 // ── Mobile touch controls ──────────────────────────────────────────────────────
-const isMobile = navigator.maxTouchPoints > 0;
+const isMobile = navigator.maxTouchPoints > 0 && window.innerWidth <= 1024;
 const BTNS = [
     { key: 'ArrowLeft',  label: '◁', cx: () => 60,               cy: () => canvas.height - 64  },
     { key: 'ArrowRight', label: '▷', cx: () => 160,              cy: () => canvas.height - 64  },
@@ -537,11 +537,15 @@ document.addEventListener('keyup', (e) => {
 
 // Touch / pointer controls (replaces old touchstart/touchend)
 canvas.addEventListener('pointerdown', (e) => {
-    const btn = btnAt(e.clientX, e.clientY);
-    if (btn) {
-        keys[btn.key] = true;
-        activePointers[e.pointerId] = btn.key;
-    } else if (state !== STATE.PLAYING) {
+    if (isMobile) {
+        const btn = btnAt(e.clientX, e.clientY);
+        if (btn) {
+            keys[btn.key] = true;
+            activePointers[e.pointerId] = btn.key;
+            return;
+        }
+    }
+    if (state !== STATE.PLAYING) {
         state = STATE.PLAYING;
         initGame();
     }

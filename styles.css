@@ -154,6 +154,21 @@ body.loaded {
         margin-top: 0.4em;
         font-family: 'Space Mono', monospace;
     }
+
+    /* Asteroids page: move nav to top corners to avoid touch control overlap */
+    .asteroids-page .monkey-link {
+        bottom: auto;
+        top: 50px;
+        right: 20px;
+        font-size: 1.6em;
+    }
+
+    .asteroids-page .slot-link {
+        bottom: auto;
+        top: 50px;
+        left: 20px;
+        font-size: 1.6em;
+    }
 }
 
 /* ---- Snake game page ---- */
