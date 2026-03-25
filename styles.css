@@ -132,6 +132,28 @@ body.loaded {
         margin-top: 0.4em;
         font-family: 'Space Mono', monospace;
     }
+
+    .rocket-link::after {
+        content: 'asteroids';
+        display: block;
+        font-size: 0.32em;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0.35;
+        margin-top: 0.4em;
+        font-family: 'Space Mono', monospace;
+    }
+
+    .slot-link::after {
+        content: 'slots';
+        display: block;
+        font-size: 0.32em;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0.35;
+        margin-top: 0.4em;
+        font-family: 'Space Mono', monospace;
+    }
 }
 
 /* ---- Snake game page ---- */
@@ -165,4 +187,395 @@ body.loaded {
 
 .monkey-link:hover {
     transform: scale(1.15);
+}
+
+/* ---- Rocket link (snake → asteroids) ---- */
+.rocket-link {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    font-size: 2.2em;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    user-select: none;
+    z-index: 10;
+}
+
+.rocket-link:hover {
+    transform: scale(1.15);
+}
+
+/* ---- Slot link (asteroids → slots) ---- */
+.slot-link {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    font-size: 2.2em;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    user-select: none;
+    z-index: 10;
+}
+
+.slot-link:hover {
+    transform: scale(1.15);
+}
+
+/* ---- Asteroids canvas ---- */
+#asteroidsCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* ---- Slots canvas ---- */
+#slotsCanvas {
+    display: block;
+    border: 1px solid rgba(140, 220, 255, 0.15);
+    box-shadow: 0 0 40px rgba(100, 180, 255, 0.1), 0 0 80px rgba(100, 180, 255, 0.04);
+    image-rendering: pixelated;
+    max-width: min(90vw, 90vh);
+    max-height: min(90vw, 90vh);
+    transition: box-shadow 0.8s ease, border-color 0.8s ease;
+}
+
+#slotsCanvas.new-best {
+    border-color: rgba(255, 215, 80, 0.5);
+    box-shadow: 0 0 40px rgba(255, 215, 80, 0.3), 0 0 80px rgba(255, 215, 80, 0.12);
+}
+
+/* ---- Terminal overlay ---- */
+.terminal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    font-family: 'Space Mono', monospace;
+    color: #00ff88;
+    font-size: 13px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+    box-sizing: border-box;
+}
+
+.terminal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#term-output {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,255,136,0.2) transparent;
+}
+
+.term-line {
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.term-info   { color: #00e5ff; }
+.term-err    { color: #ff5252; }
+.term-sys    { color: rgba(255,255,255,0.35); }
+.term-prompt { color: rgba(0,255,136,0.55); }
+
+.term-input-row {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid rgba(0,255,136,0.15);
+    padding-top: 0.6rem;
+    margin-top: 0.4rem;
+}
+
+#term-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #00ff88;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    caret-color: #00ff88;
+}
+
+/* ---- Enquiry modal ---- */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 110;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+
+.modal-backdrop.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-card {
+    position: relative;
+    background: rgba(8,8,20,0.97);
+    border: 1px solid rgba(140,220,255,0.18);
+    box-shadow: 0 0 60px rgba(100,180,255,0.1);
+    padding: 2.5rem;
+    width: min(420px, 90vw);
+    transform: scale(1);
+    transition: transform 0.25s ease;
+    font-family: 'Space Mono', monospace;
+}
+
+.modal-backdrop.hidden .modal-card {
+    transform: scale(0.95);
+}
+
+.modal-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin: 0 0 2rem;
+}
+
+.modal-label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 0.4rem;
+}
+
+.modal-input,
+.modal-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.85);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    padding: 0.4rem 0 0.6rem;
+    outline: none;
+    resize: none;
+    margin-bottom: 1.6rem;
+}
+
+.modal-input::placeholder,
+.modal-textarea::placeholder {
+    color: rgba(255,255,255,0.2);
+}
+
+.modal-input:focus,
+.modal-textarea:focus {
+    border-bottom-color: rgba(140,220,255,0.5);
+}
+
+.modal-submit {
+    background: rgba(140,220,255,0.08);
+    border: 1px solid rgba(140,220,255,0.35);
+    color: rgba(140,220,255,0.9);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    padding: 0.6rem 1.8rem;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    letter-spacing: 0.08em;
+}
+
+.modal-submit:hover {
+    background: rgba(140,220,255,0.16);
+    border-color: rgba(140,220,255,0.6);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.3);
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    transition: color 0.2s ease;
+    line-height: 1;
+    padding: 0.2rem 0.4rem;
+}
+
+.modal-close:hover {
+    color: rgba(255,255,255,0.7);
+}
+
+.modal-direct {
+    margin-top: 1.5rem;
+    font-size: 11px;
+    color: rgba(255,255,255,0.2);
+    text-align: center;
+}
+
+.modal-direct a {
+    color: rgba(140,220,255,0.5);
+    text-decoration: none;
+}
+
+.modal-direct a:hover {
+    color: rgba(140,220,255,0.8);
+}
+
+#email-trigger {
+    cursor: pointer;
+}
+
+#email-trigger:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* ---- Desktop hover labels for forward-nav links ---- */
+@media (min-width: 601px) {
+    .rocket-link::after {
+        content: 'asteroids →';
+        position: absolute;
+        left: 50%;
+        bottom: -1.4em;
+        transform: translateX(-50%);
+        font-size: 0.3em;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 0.2s;
+        white-space: nowrap;
+        font-family: 'Space Mono', monospace;
+        pointer-events: none;
+    }
+    .rocket-link:hover::after { opacity: 0.45; }
+
+    .slot-link::after {
+        content: 'slots →';
+        position: absolute;
+        left: 50%;
+        bottom: -1.4em;
+        transform: translateX(-50%);
+        font-size: 0.3em;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 0.2s;
+        white-space: nowrap;
+        font-family: 'Space Mono', monospace;
+        pointer-events: none;
+    }
+    .slot-link:hover::after { opacity: 0.45; }
+}
+
+/* ---- Terminal hint (desktop landing page) ---- */
+.terminal-hint {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: rgba(255,255,255,0.12);
+    cursor: pointer;
+    z-index: 1;
+    transition: color 0.2s ease;
+    user-select: none;
+}
+
+.terminal-hint:hover {
+    color: rgba(255,255,255,0.4);
+}
+
+/* ---- 404 page ---- */
+.four-oh-four {
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.glitch-text {
+    font-size: clamp(60px, 12vw, 120px);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.85);
+    animation: glitch 4s infinite;
+    margin: 0;
+}
+
+@keyframes glitch {
+    0%, 90%, 100% {
+        transform: translate(0);
+        text-shadow: none;
+    }
+    92% {
+        transform: translate(-3px, 1px);
+        text-shadow: 2px 0 #ff0040, -2px 0 #00ffff;
+    }
+    94% {
+        transform: translate(3px, -1px);
+        text-shadow: -2px 0 #ff0040, 2px 0 #00ffff;
+    }
+    96% {
+        transform: translate(-1px, 2px);
+        text-shadow: 1px 0 #ff0040, -1px 0 #00ffff;
+    }
+    98% {
+        transform: translate(2px, -2px);
+        text-shadow: -1px 0 #ff0040, 1px 0 #00ffff;
+    }
+}
+
+.animated-text-404 {
+    font-size: clamp(12px, 1.2vw, 16px);
+    letter-spacing: 0.04em;
+    border-right: 2px solid #e8e8e8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-shadow: 0 0 12px rgba(0,0,0,0.95), 0 0 6px #000;
+    width: 0;
+    animation:
+        typing 1.8s steps(21, end) 0.5s forwards,
+        blink-caret 0.75s step-end infinite;
+}
+
+.home-btn {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.6rem 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: rgba(140,220,255,0.9);
+    border: 1px solid rgba(140,220,255,0.35);
+    background: rgba(140,220,255,0.08);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    opacity: 0;
+    animation: fadeIn 0.5s ease 2.5s forwards;
+}
+
+.home-btn:hover {
+    background: rgba(140,220,255,0.16);
+    border-color: rgba(140,220,255,0.6);
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
 }
