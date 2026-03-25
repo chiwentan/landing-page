@@ -12,6 +12,9 @@ let score, gameSpeed, obstacles;
 let particles = [], floatingTexts = [];
 let lastTick = 0;
 let newBest = false;
+let shakeFrames = 0;      // S1: screen shake counter
+let headHistory = [];     // S4: ghost trail positions
+let currentLevel = 1;     // S3: track level for level-up flash
 
 let highScore = parseInt(localStorage.getItem('snakeHighScore') || '0');
 
@@ -27,7 +30,10 @@ function startGame() {
   obstacles = [];
   particles = [];
   floatingTexts = [];
+  headHistory = [];   // S4
+  currentLevel = 1;  // S3
   newBest = false;
+  canvas.classList.remove('new-best'); // S6
   createFood();
   state = STATE.PLAYING;
   lastTick = performance.now();
@@ -49,6 +55,10 @@ function gameLoop(ts) {
 // ---- TICK ----
 
 function tick() {
+  // S4: record head position before moving for ghost trail
+  headHistory.unshift({ x: snake[0].x, y: snake[0].y });
+  if (headHistory.length > 6) headHistory.pop();
+
   const head = { x: snake[0].x + dx, y: snake[0].y + dy };
   snake.unshift(head);
 
@@ -58,18 +68,34 @@ function tick() {
       highScore = score;
       newBest = true;
       localStorage.setItem('snakeHighScore', highScore);
+      canvas.classList.add('new-best'); // S6
     }
     spawnParticles(foodX + CELL / 2, foodY + CELL / 2);
     floatingTexts.push({ x: foodX + CELL / 2, y: foodY, text: '+10', alpha: 1, vy: -1.2 });
     createFood();
     createObstacle();
     if (gameSpeed > 50) gameSpeed -= 5;
+
+    // S3: detect level-up and show flash
+    const newLevel = Math.round((100 - gameSpeed) / 5) + 1;
+    if (newLevel > currentLevel) {
+      currentLevel = newLevel;
+      floatingTexts.push({
+        x: canvas.width / 2,
+        y: canvas.height / 2 + 10,
+        text: `LV ${newLevel}`,
+        alpha: 1,
+        vy: -0.4,
+        big: true,
+      });
+    }
   } else {
     snake.pop();
   }
 
   if (didGameEnd()) {
     state = STATE.DEAD;
+    shakeFrames = 9; // S1: trigger shake on death
   }
 }
 
@@ -118,7 +144,7 @@ function createObstacle() {
   } while (isOccupied(x, y) || (x === foodX && y === foodY));
   const w = CELL * (Math.floor(Math.random() * 2) + 1);
   const h = CELL * (Math.floor(Math.random() * 2) + 1);
-  obstacles.push({ x, y, w, h });
+  obstacles.push({ x, y, w, h, alpha: 0 }); // S2: start transparent
 }
 
 // ---- PARTICLES ----
@@ -157,6 +183,15 @@ function roundRect(x, y, w, h, r) {
 // ---- RENDER ----
 
 function render(ts) {
+  ctx.save();
+
+  // S1: screen shake on death
+  if (shakeFrames > 0) {
+    const mag = shakeFrames * 0.55;
+    ctx.translate((Math.random() * 2 - 1) * mag, (Math.random() * 2 - 1) * mag);
+    shakeFrames--;
+  }
+
   // Background
   ctx.fillStyle = '#080810';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -174,7 +209,7 @@ function render(ts) {
   if (state !== STATE.WAITING) {
     drawObstacles();
     drawFood(ts);
-    drawSnake();
+    drawSnake(ts);
     updateAndDrawParticles();
     updateAndDrawFloatingTexts();
     drawHUD();
@@ -182,21 +217,52 @@ function render(ts) {
 
   if (state === STATE.WAITING) drawWaitingScreen(ts);
   if (state === STATE.DEAD) drawGameOverScreen();
+
+  ctx.restore();
 }
 
-function drawSnake() {
+function drawSnake(ts) {
+  const level = Math.round((100 - gameSpeed) / 5) + 1;
+  const isRainbow = level >= 8; // S5: rainbow mode at Lv 8+
   const len = snake.length;
+
+  // S4: ghost trail — render previous head positions at low alpha
+  for (let i = 0; i < headHistory.length; i++) {
+    const g = headHistory[i];
+    const a = (1 - (i + 1) / (headHistory.length + 1)) * 0.14;
+    ctx.globalAlpha = a;
+    ctx.fillStyle = isRainbow
+      ? `hsl(${((ts * 0.06) % 360)}, 85%, 65%)`
+      : 'rgba(80, 255, 100, 1)';
+    roundRect(g.x + 1, g.y + 1, CELL - 2, CELL - 2, 3);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // Main snake segments
   for (let i = len - 1; i >= 0; i--) {
     const seg = snake[i];
     const t = i / Math.max(len - 1, 1);
     const lightness = 65 - t * 32;
     const alpha = 1 - t * 0.25;
-    ctx.fillStyle = `hsla(128, 75%, ${lightness}%, ${alpha})`;
-    if (i === 0) {
-      ctx.shadowColor = 'rgba(80, 255, 100, 0.7)';
-      ctx.shadowBlur = 14;
+
+    if (isRainbow) {
+      const hue = (i * 14 + ts * 0.06) % 360;
+      ctx.fillStyle = `hsla(${hue}, 85%, ${lightness}%, ${alpha})`;
+      if (i === 0) {
+        ctx.shadowColor = `hsla(${(ts * 0.06) % 360}, 85%, 65%, 0.7)`;
+        ctx.shadowBlur = 14;
+      } else {
+        ctx.shadowBlur = 0;
+      }
     } else {
-      ctx.shadowBlur = 0;
+      ctx.fillStyle = `hsla(128, 75%, ${lightness}%, ${alpha})`;
+      if (i === 0) {
+        ctx.shadowColor = 'rgba(80, 255, 100, 0.7)';
+        ctx.shadowBlur = 14;
+      } else {
+        ctx.shadowBlur = 0;
+      }
     }
     roundRect(seg.x + 1, seg.y + 1, CELL - 2, CELL - 2, 3);
     ctx.fill();
@@ -227,12 +293,14 @@ function drawFood(ts) {
 
 function drawObstacles() {
   obstacles.forEach(o => {
-    ctx.shadowColor = 'rgba(160, 80, 255, 0.5)';
+    // S2: fade in from alpha 0
+    if (o.alpha < 1) o.alpha = Math.min(1, o.alpha + 0.1);
+    ctx.shadowColor = `rgba(160, 80, 255, ${0.5 * o.alpha})`;
     ctx.shadowBlur = 8;
-    ctx.fillStyle = 'rgba(110, 50, 200, 0.85)';
+    ctx.fillStyle = `rgba(110, 50, 200, ${0.85 * o.alpha})`;
     roundRect(o.x + 1, o.y + 1, o.w - 2, o.h - 2, 2);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(180, 120, 255, 0.8)';
+    ctx.strokeStyle = `rgba(180, 120, 255, ${0.8 * o.alpha})`;
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.shadowBlur = 0;
@@ -261,13 +329,23 @@ function updateAndDrawFloatingTexts() {
   for (let i = floatingTexts.length - 1; i >= 0; i--) {
     const t = floatingTexts[i];
     t.y += t.vy;
-    t.alpha -= 0.022;
+    t.alpha -= t.big ? 0.008 : 0.022; // S3: big level-up texts fade slower
     if (t.alpha <= 0) { floatingTexts.splice(i, 1); continue; }
     ctx.globalAlpha = t.alpha;
-    ctx.font = 'bold 11px "Space Mono", monospace';
-    ctx.fillStyle = '#7fff7f';
+    if (t.big) {
+      // S3: large centered level-up flash
+      ctx.font = 'bold 26px "Space Mono", monospace';
+      ctx.fillStyle = 'rgba(100, 255, 120, 1)';
+      ctx.shadowColor = 'rgba(80, 255, 100, 0.8)';
+      ctx.shadowBlur = 14;
+    } else {
+      ctx.font = 'bold 11px "Space Mono", monospace';
+      ctx.fillStyle = '#7fff7f';
+      ctx.shadowBlur = 0;
+    }
     ctx.textAlign = 'center';
     ctx.fillText(t.text, t.x, t.y);
+    ctx.shadowBlur = 0;
   }
   ctx.globalAlpha = 1;
 }

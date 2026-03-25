@@ -9,8 +9,20 @@ body, html {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #080810;
+    background: linear-gradient(135deg, #080810, #060614, #080810, #0a0812);
+    background-size: 400% 400%;
+    animation: gradientDrift 28s ease infinite;
     color: #e8e8e8;
+}
+
+/* X1: fade in on load, fade out on navigate */
+body {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+body.loaded {
+    opacity: 1;
 }
 
 /* ---- Landing page ---- */
@@ -59,6 +71,13 @@ body, html {
 @keyframes float {
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-7px); }
+}
+
+/* L4: slow diagonal background gradient drift */
+@keyframes gradientDrift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* Penguin link to snake game */
@@ -124,6 +143,13 @@ body, html {
     image-rendering: pixelated;
     max-width: min(90vw, 90vh);
     max-height: min(90vw, 90vh);
+    transition: box-shadow 0.8s ease, border-color 0.8s ease;
+}
+
+/* S6: gold glow when beating best score */
+#gameCanvas.new-best {
+    border-color: rgba(255, 215, 80, 0.5);
+    box-shadow: 0 0 40px rgba(255, 215, 80, 0.3), 0 0 80px rgba(255, 215, 80, 0.12);
 }
 
 .monkey-link {
