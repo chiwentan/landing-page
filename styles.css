@@ -254,6 +254,7 @@ body.loaded {
     image-rendering: pixelated;
     max-width: min(90vw, 90vh);
     max-height: min(90vw, 90vh);
+    height: auto;
     transition: box-shadow 0.8s ease, border-color 0.8s ease;
 }
 
